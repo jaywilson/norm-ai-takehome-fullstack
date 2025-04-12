@@ -10,7 +10,6 @@ WORKDIR /norm-fullstack/app
 
 # Install any dependencies
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
-RUN pip install uvicorn
 
 ENV OPENAI_API_KEY=$OPENAI_API_KEY
 

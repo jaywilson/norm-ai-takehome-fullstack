@@ -3,4 +3,3 @@ __pycache__
 frontend/.next
 frontend/node_modules
 frontend/package-lock.json
-openai_api_key.txt
