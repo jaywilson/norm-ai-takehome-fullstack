@@ -1,9 +1,27 @@
-from fastapi import FastAPI, Query
-from app.utils import Output
+import uvicorn
 
-app = FastAPI()
+from contextlib import asynccontextmanager
 
-"""
-Please create an endpoint that accepts a query string, e.g., "what happens if I steal 
-from the Sept?" and returns a JSON response serialized from the Pydantic Output class.
-"""
+from fastapi import FastAPI
+from law_service import LawService
+from utils import Output
+
+law_service = LawService()
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    law_service.start()
+    yield
+    law_service.stop()
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/query", response_model=Output)
+async def root(query: str):
+    return law_service.query(query)
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8001)

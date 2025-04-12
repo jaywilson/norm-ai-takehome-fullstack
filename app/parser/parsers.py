@@ -42,6 +42,7 @@ class SimpleParser:
         return len(parts) > 2
 
 
+# TODO try https://github.com/nlmatics/nlm-ingestor
 class LLMParser:
     pdf_path = f"{project_root}/docs/laws.pdf"
     llmsherpa_api_url = "https://readers.llmsherpa.com/api/document/developer/parseDocument?renderFormat=all"

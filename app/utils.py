@@ -115,6 +115,9 @@ class QdrantService:
             citations=citations
         )
         return output
+
+    def stop(self):
+        return
        
 
 def main():
