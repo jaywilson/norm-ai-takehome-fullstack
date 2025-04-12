@@ -1,22 +1,22 @@
 # Use the official Python image from the Docker Hub
 FROM python:3.11-slim
 
-# Set the working directory inside the container
-WORKDIR /norm-fullstack
+# Copy the content of the local src directory to the working directory
+COPY ./app /norm-fullstack/app
+COPY ./docs /norm-fullstack/docs
 
-# Copy the dependencies file to the working directory
-COPY requirements.txt .
+# Set the working directory inside the container
+WORKDIR /norm-fullstack/app
 
 # Install any dependencies
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 RUN pip install uvicorn
 
-# API key
 ENV OPENAI_API_KEY=$OPENAI_API_KEY
 
-# Copy the content of the local src directory to the working directory
-COPY ./app /norm-fullstack/app
-COPY ./docs /norm-fullstack/docs
+# Use the secret during runtime setup (need to debug)
+# RUN --mount=type=secret,id=openai_key \
+#    echo "OPENAI_API_KEY=$(cat /run/secrets/openai_key)" >> .env
 
 # Command to run on container start
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--port", "80"]
