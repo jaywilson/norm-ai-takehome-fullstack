@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, Optional
 
 from pydantic import BaseModel
 import qdrant_client
@@ -12,7 +12,7 @@ from llama_index.core.query_engine import CitationQueryEngine
 from dataclasses import dataclass
 import os
 
-from parser.parsers import SimpleParser, LLMParser
+from parser.parsers import LlamaParser
 
 key = os.environ['OPENAI_API_KEY']
 
@@ -53,11 +53,11 @@ class DocumentService:
 
     @staticmethod
     def create_documents() -> Sequence[BaseNode]:
-        return SimpleParser.parse()
+        return LlamaParser.parse()
 
 class QdrantService:
     def __init__(self, k: int = 2):
-        self.index = None
+        self.index: Optional[VectorStoreIndex] = None
         self.k = k
     
     def connect(self) -> None:
@@ -100,13 +100,16 @@ class QdrantService:
 
         query_engine = CitationQueryEngine.from_args(
             index=self.index,
-            similarity_top_k=self.k,
+            # top k vectors similar to the query?
+            similarity_top_k=2,
+            verbose=True,
         )
         response = query_engine.query(query_str)
         response_text = response.response
 
         citations = []
         for source in response.source_nodes:
+            print(f"SOURCE: {source}")
             citations.append(Citation(source=source.metadata["Section"], text=source.text))
 
         output = Output(
@@ -124,8 +127,6 @@ def main():
     # Example workflow
     doc_service = DocumentService() # implemented
     docs = doc_service.create_documents() # implemented!
-    for doc in docs:
-        print(f"DOC: text: {doc.text} metadata: {doc.metadata}")
 
     index = QdrantService() # implemented
     index.connect() # implemented

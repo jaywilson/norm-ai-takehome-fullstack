@@ -3,3 +3,4 @@ __pycache__
 frontend/.next
 frontend/node_modules
 frontend/package-lock.json
+app/.env

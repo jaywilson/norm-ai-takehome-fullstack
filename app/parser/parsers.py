@@ -1,54 +1,41 @@
 from pathlib import Path
 from typing import List
 
-from PyPDF2 import PdfReader
 from llama_index.core.schema import Document
-from llmsherpa.readers import LayoutPDFReader
+from llama_cloud_services import LlamaParse
+from llama_cloud_services.parse.utils import ResultType
+from llama_index.core import SimpleDirectoryReader
 
 
 project_root = Path(__file__).parent.parent.parent
 
 
-class SimpleParser:
+class LlamaParser:
     @classmethod
     def parse(cls) -> List[Document]:
-        pdf_path = f"{project_root}/docs/laws.pdf"
-        reader = PdfReader(pdf_path)
-    
-        sections: List[Document] = []
-        cur_text = ''
-        cur_section = None
-        for page in reader.pages:
-            text = page.extract_text()
-            for word in text.splitlines():
-                if cls.is_section_start(word):
-                    if cur_section is not None:
-                        sections.append(
+        law_documents = []
+
+        parser = LlamaParse(
+            result_type=ResultType.MD
+        )
+
+        section = None
+        text = ''
+        file_extractor = {".pdf": parser}
+        documents = SimpleDirectoryReader(input_files=[f"{project_root}/docs/laws.pdf"], file_extractor=file_extractor).load_data()
+        for doc in documents:
+            for line in doc.text.split('\n'):
+                if line.startswith('#'):
+                    if section is not None and text != '':
+                        law_documents.append(
                             Document(
-                                metadata={"Section": cur_section},
-                                text=cur_text,
-                            ),
+                                text=text,
+                                metadata={"Section": section}
+                            )
                         )
-                    cur_section = word.strip()
-                    cur_text = ''
+                        text = ''
+                    section = line[2:]
                 else:
-                    cur_text += ' ' + word.strip()
-    
-        return sections
-    
-    @classmethod
-    def is_section_start(cls, word: str) -> bool:
-        parts = word.split('.')
-        return len(parts) > 2
+                    text += line
 
-
-# TODO try https://github.com/nlmatics/nlm-ingestor
-class LLMParser:
-    pdf_path = f"{project_root}/docs/laws.pdf"
-    llmsherpa_api_url = "https://readers.llmsherpa.com/api/document/developer/parseDocument?renderFormat=all"
-
-    @classmethod
-    def parse(cls) -> Document:
-        pdf_reader = LayoutPDFReader(cls.llmsherpa_api_url)
-        return pdf_reader.read_pdf(cls.pdf_path)
-
+        return law_documents
