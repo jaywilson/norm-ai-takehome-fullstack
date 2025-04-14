@@ -10,18 +10,18 @@ law_service = LawService()
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    law_service.start()
+    await law_service.start()
     yield
-    law_service.stop()
+    await law_service.stop()
 
 
 app = FastAPI(lifespan=lifespan)
 
 
-@app.get("/query", response_model=Output)
-async def root(query: str):
-    return law_service.query(query)
+@app.get("/api/query", response_model=Output)
+async def api_query(query: str, top_k: int):
+    return await law_service.query(query, top_k)
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="localhost", port=9001)

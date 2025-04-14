@@ -1,7 +1,8 @@
 from typing import Sequence, Optional
+import asyncio
 
 from pydantic import BaseModel
-import qdrant_client
+from qdrant_client import QdrantClient
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI
@@ -52,16 +53,16 @@ class DocumentService:
     """
 
     @staticmethod
-    def create_documents() -> Sequence[BaseNode]:
-        return LlamaParser.parse()
+    async def create_documents() -> Sequence[BaseNode]:
+        return await LlamaParser.parse()
 
 class QdrantService:
-    def __init__(self, k: int = 2):
+    def __init__(self):
         self.index: Optional[VectorStoreIndex] = None
-        self.k = k
     
     def connect(self) -> None:
-        client = qdrant_client.QdrantClient(location=":memory:")
+        # todo async client
+        client = QdrantClient(location=":memory:")
         vstore = QdrantVectorStore(client=client, collection_name='temp')
 
         Settings.embed_model=OpenAIEmbedding()
@@ -70,9 +71,10 @@ class QdrantService:
         self.index = VectorStoreIndex.from_vector_store(vector_store=vstore)
 
     def load(self, docs: Sequence[BaseNode]):
+        # todo how to insert with async client
         self.index.insert_nodes(docs)
     
-    def query(self, query_str: str) -> Output:
+    async def query(self, query_str: str, top_k: int) -> Output:
         """
         This method needs to initialize the query engine, run the query, and return
         the result as a pydantic Output class. This is what will be returned as
@@ -97,19 +99,17 @@ class QdrantService:
         return output
 
         """
-
         query_engine = CitationQueryEngine.from_args(
             index=self.index,
-            # top k vectors similar to the query?
-            similarity_top_k=2,
-            verbose=True,
+            similarity_top_k=top_k,
         )
+
+        # todo async query
         response = query_engine.query(query_str)
         response_text = response.response
 
         citations = []
         for source in response.source_nodes:
-            print(f"SOURCE: {source}")
             citations.append(Citation(source=source.metadata["Section"], text=source.text))
 
         output = Output(
@@ -123,10 +123,10 @@ class QdrantService:
         return
        
 
-def main():
+async def main():
     # Example workflow
     doc_service = DocumentService() # implemented
-    docs = doc_service.create_documents() # implemented!
+    docs = await doc_service.create_documents() # implemented!
 
     index = QdrantService() # implemented
     index.connect() # implemented
@@ -137,7 +137,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
 
 
 

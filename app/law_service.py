@@ -6,13 +6,13 @@ class LawService:
         self.doc_service = DocumentService()
         self.index = QdrantService()
 
-    def start(self) -> None:
-        docs = self.doc_service.create_documents()
+    async def start(self) -> None:
+        docs = await self.doc_service.create_documents()
         self.index.connect()
         self.index.load(docs)
 
-    def stop(self) -> None:
+    async def stop(self) -> None:
         self.index.stop()
 
-    def query(self, query: str) -> Output:
-        return self.index.query(query)
+    async def query(self, query: str, top_k: int) -> Output:
+        return await self.index.query(query, top_k)

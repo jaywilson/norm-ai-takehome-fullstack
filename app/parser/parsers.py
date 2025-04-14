@@ -12,7 +12,7 @@ project_root = Path(__file__).parent.parent.parent
 
 class LlamaParser:
     @classmethod
-    def parse(cls) -> List[Document]:
+    async def parse(cls) -> List[Document]:
         law_documents = []
 
         parser = LlamaParse(
@@ -22,7 +22,7 @@ class LlamaParser:
         section = None
         text = ''
         file_extractor = {".pdf": parser}
-        documents = SimpleDirectoryReader(input_files=[f"{project_root}/docs/laws.pdf"], file_extractor=file_extractor).load_data()
+        documents = await SimpleDirectoryReader(input_files=[f"{project_root}/docs/laws.pdf"], file_extractor=file_extractor).aload_data()
         for doc in documents:
             for line in doc.text.split('\n'):
                 if line.startswith('#'):
