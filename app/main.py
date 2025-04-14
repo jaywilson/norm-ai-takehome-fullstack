@@ -10,6 +10,8 @@ law_service = LawService()
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    # make sure the index is ready to query before
+    # the API is made available
     await law_service.start()
     yield
     await law_service.stop()

@@ -61,13 +61,16 @@ class QdrantService:
         self.index: Optional[VectorStoreIndex] = None
     
     def connect(self) -> None:
-        # todo async client
+        # todo use Qdrant async client
         client = QdrantClient(location=":memory:")
         vstore = QdrantVectorStore(client=client, collection_name='temp')
 
         Settings.embed_model=OpenAIEmbedding()
         Settings.llm=OpenAI(api_key=key, model="gpt-4")
         # picks up values from Settings
+        # when using the Qdrant async client, async queries still failed
+        # when the index was initialized this was, even when setting use_async=True
+        # further debugging needed to understand why
         self.index = VectorStoreIndex.from_vector_store(vector_store=vstore)
 
     def load(self, docs: Sequence[BaseNode]):
@@ -99,12 +102,17 @@ class QdrantService:
         return output
 
         """
+
+        # queries the embeddings for relevant sources and provides them
+        # in the prompt to the LLM. Top K controls the number of sources
+        # to include in the prompt (generally 2 to 3 seems to work well).
         query_engine = CitationQueryEngine.from_args(
             index=self.index,
             similarity_top_k=top_k,
         )
 
-        # todo async query
+        # todo using an an async query would allow the
+        # python web server to perform better on a single thread
         response = query_engine.query(query_str)
         response_text = response.response
 

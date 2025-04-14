@@ -13,6 +13,16 @@ project_root = Path(__file__).parent.parent.parent
 class LlamaParser:
     @classmethod
     async def parse(cls) -> List[Document]:
+        '''
+        This parse method uses LlamaParse to parse the PDF document. It uses an LLM
+        parser to identify document sections and returns the text of the document
+        formatted as Markdown.
+
+        The example document of course could be parsed with simple text parsing, but
+        Llama parse would generalize better although at significantly increased cost.
+        :return:
+        '''
+
         law_documents = []
 
         parser = LlamaParse(
