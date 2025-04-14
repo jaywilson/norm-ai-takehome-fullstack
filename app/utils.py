@@ -13,7 +13,7 @@ from llama_index.core.query_engine import CitationQueryEngine
 from dataclasses import dataclass
 import os
 
-from parser.parsers import LlamaParser
+from parsers import LlamaParser
 
 key = os.environ['OPENAI_API_KEY']
 

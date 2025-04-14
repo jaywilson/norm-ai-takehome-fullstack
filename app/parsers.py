@@ -7,7 +7,7 @@ from llama_cloud_services.parse.utils import ResultType
 from llama_index.core import SimpleDirectoryReader
 
 
-project_root = Path(__file__).parent.parent.parent
+project_root = Path(__file__).parent.parent
 
 
 class LlamaParser:
