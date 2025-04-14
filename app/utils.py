@@ -107,6 +107,10 @@ class QdrantService:
         # queries the embeddings for relevant sources and provides them
         # in the prompt to the LLM. Top K controls the number of sources
         # to include in the prompt (generally 2 to 3 seems to work well).
+
+        # initializing the query engine here allows experimenting with top k
+        # with every query, but depending on the cost of initializing it might
+        # be preferable to initialize once on service startup with a fixed top k
         query_engine = CitationQueryEngine.from_args(
             index=self.index,
             similarity_top_k=top_k,
@@ -129,6 +133,7 @@ class QdrantService:
         return output
 
     def stop(self):
+        # placeholder to clean up any resources on shutdown
         return
        
 
