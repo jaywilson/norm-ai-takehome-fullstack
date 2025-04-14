@@ -146,7 +146,7 @@ async def main():
     index.connect() # implemented
     index.load(docs) # implemented
 
-    output = index.query("what happens if I steal?") # implemented!
+    output = index.query("what happens if I steal?", 3) # implemented!
     print(f"OUTPUT: {output}")
 
 
