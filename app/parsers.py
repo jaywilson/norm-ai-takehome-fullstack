@@ -13,26 +13,26 @@ project_root = Path(__file__).parent.parent
 class LlamaParser:
     @classmethod
     async def parse(cls) -> List[Document]:
-        '''
+        """
         This parse method uses LlamaParse to parse the PDF document. It uses an LLM
         parser to identify document sections and returns the text of the document
         formatted as Markdown.
 
         The example document of course could be parsed with simple text parsing, but
         Llama parse would generalize better although at significantly increased cost.
-        :return:
-        '''
+        """
+
+        parser = LlamaParse(result_type=ResultType.MD)
+        file_extractor = {".pdf": parser}
+        reader = SimpleDirectoryReader(
+            input_files=[f"{project_root}/docs/laws.pdf"],
+            file_extractor=file_extractor
+        )
+        documents = await reader.aload_data()
 
         law_documents = []
-
-        parser = LlamaParse(
-            result_type=ResultType.MD
-        )
-
         section = None
         text = ''
-        file_extractor = {".pdf": parser}
-        documents = await SimpleDirectoryReader(input_files=[f"{project_root}/docs/laws.pdf"], file_extractor=file_extractor).aload_data()
         for doc in documents:
             for line in doc.text.split('\n'):
                 if line.startswith('#'):
