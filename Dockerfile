@@ -11,11 +11,11 @@ WORKDIR /norm-fullstack/app
 # Install any dependencies
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
+ARG OPENAI_API_KEY
 ENV OPENAI_API_KEY=$OPENAI_API_KEY
 
-# Use the secret during runtime setup (need to debug)
-# RUN --mount=type=secret,id=openai_key \
-#    echo "OPENAI_API_KEY=$(cat /run/secrets/openai_key)" >> .env
+ARG LLAMA_CLOUD_API_KEY
+ENV LLAMA_CLOUD_API_KEY=$LLAMA_CLOUD_API_KEY
 
 # Command to run on container start
-CMD ["uvicorn", "main:app", "--port", "80"]
+CMD ["uvicorn", "main:app", "--port", "80", "--host", "0.0.0.0"]
