@@ -1,6 +1,4 @@
-This repository contains a client and server codebase. 
-
-## Law Server:
+## Law Server
 
 The server implements a simple API to query laws from GoT.
 
