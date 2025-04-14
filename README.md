@@ -2,7 +2,7 @@ This repository contains a client and server codebase.
 
 ## Law Server:
 
-The server implements a simple API to query laws from GoT. You can start the server with:
+The server implements a simple API to query laws from GoT.
 
 First build the docker image:
 
