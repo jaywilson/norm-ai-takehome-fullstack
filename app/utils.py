@@ -62,19 +62,20 @@ class QdrantService:
     
     def connect(self) -> None:
         # todo use Qdrant async client
+        # when I tried, insert_nodes fails
         client = QdrantClient(location=":memory:")
         vstore = QdrantVectorStore(client=client, collection_name='temp')
 
         Settings.embed_model=OpenAIEmbedding()
         Settings.llm=OpenAI(api_key=key, model="gpt-4")
         # picks up values from Settings
-        # when using the Qdrant async client, async queries still failed
-        # when the index was initialized this was, even when setting use_async=True
-        # further debugging needed to understand why
         self.index = VectorStoreIndex.from_vector_store(vector_store=vstore)
 
     def load(self, docs: Sequence[BaseNode]):
         # todo how to insert with async client
+        # when using the async client this fails because _client is None
+        # even if use_async is specified when creating the vector store
+        # further debugging needed...
         self.index.insert_nodes(docs)
     
     async def query(self, query_str: str, top_k: int) -> Output:
