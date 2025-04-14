@@ -1,6 +1,6 @@
 This repository contains a client and server codebase. 
 
-## Server Repository:
+## Law Server:
 
 The server implements a simple API to query laws from GoT. You can start the server with:
 
@@ -12,7 +12,7 @@ The run the server:
 
 `docker run -p 9001:80 law_server:latest`
 
-## Client Repository 
+## Query UI
 
 Start the frontend server:
 
